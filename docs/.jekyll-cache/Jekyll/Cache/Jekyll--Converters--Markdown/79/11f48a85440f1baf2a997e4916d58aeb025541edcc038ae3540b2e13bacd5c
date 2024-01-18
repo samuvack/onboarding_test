@@ -1,0 +1,168 @@
+I"K<h1 id="publishing-a-simple-data-set-with-a-basic-setup">Publishing a Simple Data Set With a Basic Setup</h1>
+<p>This quick start guide will show you how to combine a <a href="https://informatievlaanderen.github.io/VSDS-Linked-Data-Interactions/">LDIO Workbench</a> and a <a href="https://informatievlaanderen.github.io/VSDS-LDESServer4J/">LDES Server</a> to create a basic setup for publishing <a href="https://en.wikipedia.org/wiki/Linked_data">linked data</a> as a <a href="https://semiceu.github.io/LinkedDataEventStreams/">Linked Data Event Stream (LDES)</a>.</p>
+
+<p>Please see the <a href="../README.md">introduction</a> for the example data set and pre-requisites, as well as an overview of all examples.</p>
+
+<h2 id="all-the-things-we-need">All the Things We Need</h2>
+<p>In order to publish your data set as a LDES you will need to setup and configure a few systems. To start with you need a LDES Server. It will accepts, store and serve the data set. Next you will need a workbench which at the least creates version objects from your data set which typically consists of state objects. In addition, as your data set will typically not be linked data, you will have to create a small pipeline in the workbench to transform your custom data model formatted in whatever format that you expose to a linked data model. The LDES server can ingest the resulting linked data model from several <a href="https://en.wikipedia.org/wiki/Resource_Description_Framework">RDF</a> serializations and serve the event stream in any of those <a href="https://en.wikipedia.org/wiki/Resource_Description_Framework#Serialization_formats">RDF formats</a>.</p>
+
+<p>Let’s start by creating a <a href="https://docs.docker.com/compose/">Docker Compose</a> file containing a LDES server, its <a href="https://www.mongodb.com/">MongoDB</a> storage container and a LDIO Workbench. First, we start by naming the file <code class="language-plaintext highlighter-rouge">docker-compose.yml</code> and add the file version and a private network which allows our three systems to interact:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">2.0'</span>
+
+<span class="na">networks</span><span class="pi">:</span>
+  <span class="na">basic-setup</span><span class="pi">:</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">basic-setup_ldes-network</span>
+</code></pre></div></div>
+
+<p>We add the MongoDB system as our first service. We simply use the latest <code class="language-plaintext highlighter-rouge">mongo</code> image from <a href="https://hub.docker.com/_/mongo">Docker Hub</a> and expose the default MongoDB port. This allows use to use a tool such as <a href="https://www.mongodb.com/products/tools/compass">MongoDB Compass</a> to examine the database if needed:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+
+  <span class="na">ldes-mongodb</span><span class="pi">:</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">basic-setup_ldes-mongodb</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">mongo:latest</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">27017:27017</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">basic-setup</span>
+</code></pre></div></div>
+
+<p>After that we add a LDES Server as a service, point it to its configuration file using volume mapping, expose its port so we can retrieve the event stream and set it to depend on the storage container in order to delay starting the server container until after the storage container:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">ldes-server</span><span class="pi">:</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">basic-setup_ldes-server</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">ldes/ldes-server:2.5.0-SNAPSHOT</span> <span class="c1"># you can safely change this to the latest 2.x.y version</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">./server/application.yml:/application.yml:ro</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">9003:80</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">basic-setup</span>
+    <span class="na">depends_on</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">ldes-mongodb</span>
+</code></pre></div></div>
+
+<p>Finally, we add a LDIO Workbench as a service. It too needs to have access to its configuration file which we again provide using volume mapping. We also need to expose the workbench listener port so we can feed it with models from our custom data set.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">ldio-workbench</span><span class="pi">:</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">basic-setup_ldio-workbench</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">ldes/ldi-orchestrator:1.11.0-SNAPSHOT</span> <span class="c1"># you can safely change this to the latest 1.x.y version</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">./workbench/application.yml:/ldio/application.yml:ro</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">9004:80</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">basic-setup</span> 
+</code></pre></div></div>
+
+<p>We end up with <a href="./docker-compose.yml">this</a> Docker compose file. At this point we cannot start the containers yet as we do refer to the LDES Server and the LDIO Workbench configuration files but we still need to create them.</p>
+
+<h2 id="create-the-ldes-server-configuration-file">Create the LDES Server Configuration File</h2>
+<p>Let’s continue by creating a configuration file for the LDES Server. But before we do we need to think about and decide on a few things:</p>
+<ul>
+  <li>in which database do we store the LDES and related information?</li>
+  <li>on what sub-path will we serve our LDES?</li>
+  <li>on what port will we run our server?</li>
+</ul>
+
+<p>For this tutorial we can pick any name for the database. Let’s go for <code class="language-plaintext highlighter-rouge">basic-setup</code>. As within our private Docker network the containers can be reached by using their service name, the MongoDB connection string becomes <code class="language-plaintext highlighter-rouge">mongodb://ldes-mongodb/basic-setup</code>. We do not need to specify the default port <code class="language-plaintext highlighter-rouge">27017</code>.</p>
+
+<p>For the port (<code class="language-plaintext highlighter-rouge">server.port</code>) and sub-path (<code class="language-plaintext highlighter-rouge">server.servlet.context-path</code>) on which the LDES Server is available we’ll go for <code class="language-plaintext highlighter-rouge">80</code> respectively <code class="language-plaintext highlighter-rouge">/ldes</code>.</p>
+
+<blockquote>
+  <p><strong>Note</strong> that we had to specify that indexes should be created automatically by the application (<code class="language-plaintext highlighter-rouge">auto-index-creation: true</code>).</p>
+</blockquote>
+
+<blockquote>
+  <p><strong>Note</strong> that we also need to specify the external base URL of the LDES so that we can follow the event stream from our local system (<code class="language-plaintext highlighter-rouge">host-name: http://localhost:9003/ldes</code>) because we set a sub-path (<code class="language-plaintext highlighter-rouge">context-path: /ldes</code>). Of course if we would change the server’s <a href="./docker-compose.yml#L23">external port number</a> in the Docker compose file, we need to change it here as well.</p>
+</blockquote>
+
+<h2 id="create-the-ldio-workbench-configuration-file">Create the LDIO Workbench Configuration File</h2>
+<p>For the workbench configuration file we can start from the <a href="../minimal-workbench/config/application.yml">configuration</a> we used for the <a href="../minimal-workbench/README.md">minimal workbench tutorial</a> but serve the pipelines on a different port (<code class="language-plaintext highlighter-rouge">80</code>).</p>
+
+<p>As we are now creating an integrated setup we will not send the generated members to the container log using the <code class="language-plaintext highlighter-rouge">LdioConsoleout</code> component, but instead we use the <code class="language-plaintext highlighter-rouge">LdioHttpOut</code> component. This component allows us to send the member to the LDES server ingest endpoint over HTTP. How do we determine this HTTP ingest endpoint? Because the LDIO Workbench and the LDES Server share the same private network, the workbench can address the server using its service name <code class="language-plaintext highlighter-rouge">ldes-server</code> as server path <code class="language-plaintext highlighter-rouge">http://ldes-server</code>. As we have set the sub-path to serve all event streams from <code class="language-plaintext highlighter-rouge">/ldes</code> we append that to the server path. Finally, as we <a href="./definitions/occupancy.ttl">define</a> our LDES in the same way as we did in the <a href="../minimal-server/README.md">minimal server tutorial</a>, we need to append the name of the LDES (<code class="language-plaintext highlighter-rouge">/occupancy</code>). Putting all of this together, in this tutorial the HTTP ingest endpoint for our LDES becomes <code class="language-plaintext highlighter-rouge">http://ldes-server/ldes/occupancy</code>. The configuration for our output thus becomes:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">outputs</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">be.vlaanderen.informatievlaanderen.ldes.ldio.LdioHttpOut</span>
+    <span class="na">config</span><span class="pi">:</span>
+      <span class="na">endpoint</span><span class="pi">:</span> <span class="s">http://ldes-server/ldes/occupancy</span>
+      <span class="na">rdf-writer</span><span class="pi">:</span>
+        <span class="na">content-type</span><span class="pi">:</span> <span class="s">application/n-quads</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Note</strong> that we can use the <code class="language-plaintext highlighter-rouge">rdf-writer.content-type</code> setting to change the RDF format used when sending the member to the LDES Server ingest endpoint. By default it is <a href="https://en.wikipedia.org/wiki/Turtle_(syntax)">Turtle</a> (<code class="language-plaintext highlighter-rouge">text/turtle</code>) but here we choose <a href="https://en.wikipedia.org/wiki/N-Triples#N-Quads">N-quads</a> (<code class="language-plaintext highlighter-rouge">application/n-quads</code>) as this is faster than any other RDF serialization both when writing and parsing.</p>
+</blockquote>
+
+<p>In our minimal workbench tutorial we assumed that we had linked data and we POST’ed a message formatted as <a href="https://json-ld.org/">JSON-LD</a> to the workbench. Usually, you will have data in a more traditional (non-linked data) model. Typically there will be an API that you can poll or maybe the source system will notify you of changes using messages. No matter if the interface is pull-driven or push-driven, the data will be format using JSON, XML, CSV or similar. Now, let’s assume that on the input side we have a <a href="./data/message.json">JSON message</a> that is pushed into the workbench pipeline. We need to turn this non-linked data into linked-data. To accomplish this we can attach a <a href="./workbench/context.jsonld">JSON-LD context</a> to the message. To do so, we need to use a <code class="language-plaintext highlighter-rouge">JsonToLdAdapter</code> in the <code class="language-plaintext highlighter-rouge">LdioHttpIn</code> component and configure to use our context. We also need to <a href="./docker-compose.yml#L33">map the context</a> in the container as follows:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">volumes</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">./workbench/context.jsonld:/ldio/context.jsonld:ro</span>
+</code></pre></div></div>
+
+<p>Now we can change the workbench input configuration to:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">input</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">be.vlaanderen.informatievlaanderen.ldes.ldio.LdioHttpIn</span>
+  <span class="na">adapter</span><span class="pi">:</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">be.vlaanderen.informatievlaanderen.ldes.ldi.JsonToLdAdapter</span>
+    <span class="na">config</span><span class="pi">:</span>
+      <span class="na">core-context</span><span class="pi">:</span> <span class="s">file:///ldio/context.jsonld</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Note</strong> that we have to use the URI notation for the internal container path (<code class="language-plaintext highlighter-rouge">/ldio/context.jsonld</code>). Alternatively, we could use some pre-existing context somewhere online ar refer to it by URL.</p>
+</blockquote>
+
+<p>For the transformations steps we keep the same configuration for the version object creation and end up with the resulting <a href="./workbench/application.yml">configuration file</a></p>
+
+<h2 id="bringing-it-all-together">Bringing it All Together</h2>
+<p>Now that we have everything set up, let’s test the systems. We need to bring all systems up, wait for both the LDIO Workbench and LDES Server to be available, send the LDES and view definitions to the server and finally send the JSON message to the workbench. Then we can retrieve the LDEs, the view and the page containing the actual member.</p>
+
+<p>To run the systems, wait, send definitions and message:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>clear
+<span class="c"># bring the systems up</span>
+docker compose up <span class="nt">-d</span>
+<span class="c"># wait for the workbench</span>
+<span class="k">while</span> <span class="o">!</span> docker logs <span class="si">$(</span>docker ps <span class="nt">-q</span> <span class="nt">-f</span> <span class="s2">"name=ldio-workbench$"</span><span class="si">)</span> 2&gt; /dev/null | <span class="nb">grep</span> <span class="s1">'Started Application in'</span> <span class="p">;</span> <span class="k">do </span><span class="nb">sleep </span>1<span class="p">;</span> <span class="k">done</span>
+<span class="c"># wait for the server</span>
+<span class="k">while</span> <span class="o">!</span> docker logs <span class="si">$(</span>docker ps <span class="nt">-q</span> <span class="nt">-f</span> <span class="s2">"name=ldes-server$"</span><span class="si">)</span> 2&gt; /dev/null | <span class="nb">grep</span> <span class="s1">'Started Application in'</span> <span class="p">;</span> <span class="k">do </span><span class="nb">sleep </span>1<span class="p">;</span> <span class="k">done</span>
+<span class="c"># define the LDES</span>
+curl <span class="nt">-X</span> POST <span class="nt">-H</span> <span class="s2">"content-type: text/turtle"</span> <span class="s2">"http://localhost:9003/ldes/admin/api/v1/eventstreams"</span> <span class="nt">-d</span> <span class="s2">"@./definitions/occupancy.ttl"</span>
+<span class="c"># define the view</span>
+curl <span class="nt">-X</span> POST <span class="nt">-H</span> <span class="s2">"content-type: text/turtle"</span> <span class="s2">"http://localhost:9003/ldes/admin/api/v1/eventstreams/occupancy/views"</span> <span class="nt">-d</span> <span class="s2">"@./definitions/occupancy.by-page.ttl"</span>
+<span class="c"># send the message</span>
+curl <span class="nt">-X</span> POST <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="s2">"http://localhost:9004/p+r-pipeline"</span> <span class="nt">-d</span> <span class="s2">"@./data/message.json"</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Note</strong> that we send the definitions to <code class="language-plaintext highlighter-rouge">http://localhost:9003/ldes</code> because we have defined <code class="language-plaintext highlighter-rouge">server.servlet.context-path: /ldes</code>.</p>
+</blockquote>
+
+<blockquote>
+  <p><strong>Note</strong> that we send a JSON message now and therefore specify a header <code class="language-plaintext highlighter-rouge">Content-Type: application/json</code>.</p>
+</blockquote>
+
+<p>To verify the LDES, view and data:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>clear
+<span class="c"># get the LDES</span>
+curl http://localhost:9003/ldes/occupancy
+<span class="c"># get the view</span>
+curl http://localhost:9003/ldes/occupancy/by-page
+<span class="c"># get the data</span>
+curl http://localhost:9003/ldes/occupancy/by-page?pageNumber<span class="o">=</span>1
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Note</strong> that we explicitly noted the three steps to get to the data. Typically a system that wants to replicate and synchronize a LDES only needs access to the LDES itself and can discover the view and subsequently the pages of that view by following the links in the LDES and view. To do so, we can use a <a href="https://informatievlaanderen.github.io/VSDS-Linked-Data-Interactions/core/ldi-inputs/ldes-client">LDES Client</a> but that is a different tutorial.</p>
+</blockquote>
+
+<h2 id="the-party-is-over-lets-go-home">The Party is Over, Let’s Go Home</h2>
+<p>You should now know how to publish a simple data set using a LDES Workbench and use a LDES Server to serve this data set using LDES. You learned how to setup a Docker compose file from scratch, how to configure the LDES Server on a different path and port, how to configure a LDIO Workbench to accept non-linked data and send it to the LDES Server. You can now stop all the systems.</p>
+
+<p>To bring the containers down and remove the private network:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker compose down
+</code></pre></div></div>
+
+:ET

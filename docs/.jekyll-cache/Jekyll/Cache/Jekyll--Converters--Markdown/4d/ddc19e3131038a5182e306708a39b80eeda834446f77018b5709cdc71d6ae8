@@ -1,0 +1,111 @@
+I"ä$<h2 id="input-data">Input data</h2>
+
+<p>Onderstaande datavoorbeelden werden gedownload van GRBgis via de download toepassing: https://download.vlaanderen.be/product/1-grbgis</p>
+
+<p>Downloadtoepassing voor data wegenregister geeft enkel shapefile weer: https://download.vlaanderen.be/product/10412-wegenregister-15122023</p>
+
+<h2 id="wegsegment">Wegsegment</h2>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="nt">&lt;agiv:FeatureCollection</span> <span class="na">xmlns:gml=</span><span class="s">"http://www.opengis.net/gml"</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span> <span class="na">xmlns:xlink=</span><span class="s">"http://www.w3.org/1999/xlink"</span> <span class="na">xsi:schemaLocation=</span><span class="s">"http://www.agiv.be/agiv Wegsegment44040.xsd"</span> <span class="na">xmlns:agiv=</span><span class="s">"http://www.agiv.be/agiv"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;gml:boundedBy&gt;</span>
+    <span class="nt">&lt;gml:Box</span> <span class="na">srsName=</span><span class="s">"EPSG:31370"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;gml:coordinates&gt;</span>107440.708013833,184783.609986328 112696.828017466,192266.132487502<span class="nt">&lt;/gml:coordinates&gt;</span>
+    <span class="nt">&lt;/gml:Box&gt;</span>
+  <span class="nt">&lt;/gml:boundedBy&gt;</span>
+  <span class="nt">&lt;gml:featureMember&gt;</span>
+    <span class="nt">&lt;agiv:Wegsegment44040&gt;</span>
+      <span class="nt">&lt;agiv:OIDN&gt;</span>730719<span class="nt">&lt;/agiv:OIDN&gt;</span>
+      <span class="nt">&lt;agiv:UIDN&gt;</span>1790014<span class="nt">&lt;/agiv:UIDN&gt;</span>
+      <span class="nt">&lt;agiv:VERSIE&gt;</span>1<span class="nt">&lt;/agiv:VERSIE&gt;</span>
+      <span class="nt">&lt;agiv:BEGINDATUM&gt;</span>2023-05-03<span class="nt">&lt;/agiv:BEGINDATUM&gt;</span>
+      <span class="nt">&lt;agiv:VERSDATUM&gt;</span>2023-05-03<span class="nt">&lt;/agiv:VERSDATUM&gt;</span>
+      <span class="nt">&lt;agiv:WS_OIDN&gt;</span>144503<span class="nt">&lt;/agiv:WS_OIDN&gt;</span>
+      <span class="nt">&lt;agiv:WS_UIDN&gt;</span>144503_1<span class="nt">&lt;/agiv:WS_UIDN&gt;</span>
+      <span class="nt">&lt;agiv:STATUS&gt;</span>4<span class="nt">&lt;/agiv:STATUS&gt;</span>
+      <span class="nt">&lt;agiv:LBLSTATUS&gt;</span>in gebruik<span class="nt">&lt;/agiv:LBLSTATUS&gt;</span>
+      <span class="nt">&lt;agiv:LSTRNMID&gt;</span>-9<span class="nt">&lt;/agiv:LSTRNMID&gt;</span>
+      <span class="nt">&lt;agiv:LSTRNM&gt;</span>nvt<span class="nt">&lt;/agiv:LSTRNM&gt;</span>
+      <span class="nt">&lt;agiv:LNISCODE&gt;</span>-8<span class="nt">&lt;/agiv:LNISCODE&gt;</span>
+      <span class="nt">&lt;agiv:LGEMEENTE&gt;</span>ng<span class="nt">&lt;/agiv:LGEMEENTE&gt;</span>
+      <span class="nt">&lt;agiv:RSTRNMID&gt;</span>-9<span class="nt">&lt;/agiv:RSTRNMID&gt;</span>
+      <span class="nt">&lt;agiv:RSTRNM&gt;</span>nvt<span class="nt">&lt;/agiv:RSTRNM&gt;</span>
+      <span class="nt">&lt;agiv:RNISCODE&gt;</span>-8<span class="nt">&lt;/agiv:RNISCODE&gt;</span>
+      <span class="nt">&lt;agiv:RGEMEENTE&gt;</span>ng<span class="nt">&lt;/agiv:RGEMEENTE&gt;</span>
+      <span class="nt">&lt;agiv:MORF&gt;</span>114<span class="nt">&lt;/agiv:MORF&gt;</span>
+      <span class="nt">&lt;agiv:LBLMORF&gt;</span>wandel- of fietsweg, niet toegankelijk voor andere voertuigen<span class="nt">&lt;/agiv:LBLMORF&gt;</span>
+      <span class="nt">&lt;agiv:WEGCAT&gt;</span>-9<span class="nt">&lt;/agiv:WEGCAT&gt;</span>
+      <span class="nt">&lt;agiv:LBLWEGCAT&gt;</span>niet van toepassing<span class="nt">&lt;/agiv:LBLWEGCAT&gt;</span>
+      <span class="nt">&lt;agiv:VERH&gt;</span>2<span class="nt">&lt;/agiv:VERH&gt;</span>
+      <span class="nt">&lt;agiv:LBLVERH&gt;</span>weg met losse verharding<span class="nt">&lt;/agiv:LBLVERH&gt;</span>
+      <span class="nt">&lt;agiv:BEHEER&gt;</span>44040<span class="nt">&lt;/agiv:BEHEER&gt;</span>
+      <span class="nt">&lt;agiv:LBLBEHEER&gt;</span>Gemeente Melle<span class="nt">&lt;/agiv:LBLBEHEER&gt;</span>
+      <span class="nt">&lt;agiv:METHODE&gt;</span>2<span class="nt">&lt;/agiv:METHODE&gt;</span>
+      <span class="nt">&lt;agiv:LBLMETHODE&gt;</span>ingemeten<span class="nt">&lt;/agiv:LBLMETHODE&gt;</span>
+      <span class="nt">&lt;agiv:TGBEP&gt;</span>1<span class="nt">&lt;/agiv:TGBEP&gt;</span>
+      <span class="nt">&lt;agiv:LBLTGBEP&gt;</span>openbare weg<span class="nt">&lt;/agiv:LBLTGBEP&gt;</span>
+      <span class="nt">&lt;agiv:BGNINV&gt;</span>-9<span class="nt">&lt;/agiv:BGNINV&gt;</span>
+      <span class="nt">&lt;agiv:LBLBGNINV&gt;</span>niet van toepassing<span class="nt">&lt;/agiv:LBLBGNINV&gt;</span>
+      <span class="nt">&lt;agiv:LENGTE&gt;</span>117.62<span class="nt">&lt;/agiv:LENGTE&gt;</span>
+      <span class="nt">&lt;gml:lineStringProperty&gt;</span>
+        <span class="nt">&lt;gml:LineString</span> <span class="na">srsName=</span><span class="s">"EPSG:31370"</span><span class="nt">&gt;</span>
+          <span class="nt">&lt;gml:coordinates&gt;</span>111735.735024802,186845.156995755 111695.148976773,186801.500995725 111670.02302476,186788.219971713 111642.305008739,186777.843011707<span class="nt">&lt;/gml:coordinates&gt;</span>
+        <span class="nt">&lt;/gml:LineString&gt;</span>
+      <span class="nt">&lt;/gml:lineStringProperty&gt;</span>
+    <span class="nt">&lt;/agiv:Wegsegment44040&gt;</span>
+  <span class="nt">&lt;/gml:featureMember&gt;</span>
+  <span class="nt">&lt;/gml:featureMember&gt;</span>
+<span class="nt">&lt;/agiv:FeatureCollection&gt;</span>
+</code></pre></div></div>
+
+<h2 id="wegknoop">Wegknoop</h2>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="nt">&lt;agiv:FeatureCollection</span> <span class="na">xmlns:gml=</span><span class="s">"http://www.opengis.net/gml"</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span> <span class="na">xmlns:xlink=</span><span class="s">"http://www.w3.org/1999/xlink"</span> <span class="na">xsi:schemaLocation=</span><span class="s">"http://www.agiv.be/agiv Wegknoop44040.xsd"</span> <span class="na">xmlns:agiv=</span><span class="s">"http://www.agiv.be/agiv"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;gml:boundedBy&gt;</span>
+    <span class="nt">&lt;gml:Box</span> <span class="na">srsName=</span><span class="s">"EPSG:31370"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;gml:coordinates&gt;</span>107537.922029905,184888.016002402 112320.775345206,191227.645446785<span class="nt">&lt;/gml:coordinates&gt;</span>
+    <span class="nt">&lt;/gml:Box&gt;</span>
+  <span class="nt">&lt;/gml:boundedBy&gt;</span>
+
+  <span class="nt">&lt;gml:featureMember&gt;</span>
+    <span class="nt">&lt;agiv:Wegknoop44040&gt;</span>
+      <span class="nt">&lt;agiv:OIDN&gt;</span>1053685<span class="nt">&lt;/agiv:OIDN&gt;</span>
+      <span class="nt">&lt;agiv:UIDN&gt;</span>1079324<span class="nt">&lt;/agiv:UIDN&gt;</span>
+      <span class="nt">&lt;agiv:VERSIE&gt;</span>1<span class="nt">&lt;/agiv:VERSIE&gt;</span>
+      <span class="nt">&lt;agiv:BEGINDATUM&gt;</span>2023-05-03<span class="nt">&lt;/agiv:BEGINDATUM&gt;</span>
+      <span class="nt">&lt;agiv:VERSDATUM&gt;</span>2023-05-03<span class="nt">&lt;/agiv:VERSDATUM&gt;</span>
+      <span class="nt">&lt;agiv:WK_OIDN&gt;</span>2010770<span class="nt">&lt;/agiv:WK_OIDN&gt;</span>
+      <span class="nt">&lt;agiv:WK_UIDN&gt;</span>2010770_1<span class="nt">&lt;/agiv:WK_UIDN&gt;</span>
+      <span class="nt">&lt;agiv:TYPE&gt;</span>1<span class="nt">&lt;/agiv:TYPE&gt;</span>
+      <span class="nt">&lt;agiv:LBLTYPE&gt;</span>echte knoop<span class="nt">&lt;/agiv:LBLTYPE&gt;</span>
+      <span class="nt">&lt;agiv:BGNINV&gt;</span>-9<span class="nt">&lt;/agiv:BGNINV&gt;</span>
+      <span class="nt">&lt;agiv:LBLBGNINV&gt;</span>niet van toepassing<span class="nt">&lt;/agiv:LBLBGNINV&gt;</span>
+      <span class="nt">&lt;gml:pointProperty&gt;</span>
+        <span class="nt">&lt;gml:Point</span> <span class="na">srsName=</span><span class="s">"EPSG:31370"</span><span class="nt">&gt;</span>
+          <span class="nt">&lt;gml:coordinates&gt;</span>111915.845104925,186717.758595664<span class="nt">&lt;/gml:coordinates&gt;</span>
+        <span class="nt">&lt;/gml:Point&gt;</span>
+      <span class="nt">&lt;/gml:pointProperty&gt;</span>
+    <span class="nt">&lt;/agiv:Wegknoop44040&gt;</span>
+  <span class="nt">&lt;/gml:featureMember&gt;</span>
+
+<span class="nt">&lt;/agiv:FeatureCollection&gt;</span>
+</code></pre></div></div>
+
+<h2 id="aantal-rijstroken-attrijstroken">Aantal rijstroken (AttRijstroken)</h2>
+
+<h2 id="wegbreedte-attwegbreedte">Wegbreedte (AttWegbreedte)</h2>
+
+<h2 id="wegverharding-attwegverhard">Wegverharding (AttWegverhard)</h2>
+
+<h2 id="ongelijkgrondse-kruising-rltogkruising">Ongelijkgrondse kruising (RltOgkruising)</h2>
+
+<h2 id="europese-weg-atteuropweg">Europese weg (AttEuropweg)</h2>
+
+<h2 id="nationale-weg-attnationweg">Nationale weg (AttNationweg)</h2>
+
+<h2 id="genummerde-weg-attgenumweg">Genummerde weg (AttGenumweg)</h2>
+
+<h2 id="referentiepunt-refpunt">Referentiepunt (Refpunt)</h2>
+
+:ET

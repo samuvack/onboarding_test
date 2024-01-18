@@ -1,0 +1,110 @@
+I"ï8<h1 id="oslo-mapping">OSLO mapping</h1>
+
+<figure class="highlight">
+  <pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
+  </span><span class="nl">"@context"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"https://raw.githubusercontent.com/samuvack/context/main/wegenregister.jsonld"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"https://data.vlaanderen.be/doc/applicatieprofiel/GEODCAT-AP-VL/erkendestandaard/2022-04-21/context/geodcatap-vlaanderen.jsonld"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"https://data.vlaanderen.be/doc/applicatieprofiel/generiek-basis/zonderstatus/2019-07-01/context/generiek-basis.jsonld"</span><span class="w">
+  </span><span class="p">,</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+  </span><span class="nl">"cl-morfologieType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://data.vlaanderen.be/doc/concept/Wegenregister_morfologieType"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"cl-wegcategorieType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://data.vlaanderen.be/doc/concept/Wegenregister_wegcategorieType"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"cl-wegsegmentStatus"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://data.vlaanderen.be/doc/concept/Wegenregister_wegcategorieType"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"cl-geometrieMethode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://data.vlaanderen.be/doc/concept/Wegenregister_geometrieMethode"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"cl-genummerdeWegRichting"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://data.vlaanderen.be/doc/concept/Wegenregister_genummerdeWegRichting"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"cl-toegangsbeperkingType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://data.vlaanderen.be/doc/concept/Wegenregister_toegangsbeperkingType"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"cl-wegknoopType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://data.vlaanderen.be/doc/concept/Wegenregister_wegknoopType"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"cl-wegcategorie"</span><span class="p">:</span><span class="w">  </span><span class="s2">"https://data.vlaanderen.be/doc/concept/Wegenregister_wegcategorie"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"cl-referentiepuntType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://data.vlaanderen.be/doc/concept/Wegenregister_referentiepuntType"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"cl_ondergrondseKruisingType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://data.vlaanderen.be/doc/concept/Wegenregister_referentiepuntType"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"cl-wegsegmentStatus"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://data.vlaanderen.be/doc/concept/Wegenregister_wegsegmentStatus"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"cl-wegverhardingType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://data.vlaanderen.be/doc/concept/Wegenregister_wegverhardingType"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"cl-toegangsbeperkingType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://data.vlaanderen.be/doc/concept/Wegenregister_toegangsbeperkingType"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"cl-beheerder"</span><span class="p">:</span><span class="s2">"https://data.vlaanderen.be/doc/concept/Wegenregister_beheerder"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"cl-richtingWaarde"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://data.vlaanderen.be/doc/concept/Wegenregister_richtingWaarde"</span><span class="w">
+</span><span class="p">}],</span><span class="w">
+
+  </span><span class="nl">"@graph"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"@id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"_:datasetweg001"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"@type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Dataset"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"Dataset.titel"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"@language"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nl"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"@value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GRB - wegenregister"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="nl">"Dataset.beschrijving"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"@language"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nl"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"@value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Het Wegenregister is het middenschalig referentiebestand van de wegen in Vlaanderen."</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="nl">"Dataset.toegankelijkheid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"cl-access:PUBLIC"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"Dataset.trefwoord"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"@language"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nl"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"@value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GRB"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"@id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"_:wegsegment001"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"@type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Wegsegment"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"middellijnGeometrie"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"@type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Lijnstring"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"Geometrie.gml"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"@value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;gml:LineString srsName='urn:ogc:def:crs:EPSG::31370' srsDimension='2'&gt;&lt;gml:posList&gt; 107440.708013833,184783.609986328 112696.828017466,192266.132487502 &lt;/gml:posList&gt;&lt;/gml:LineString&gt;"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"@type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"geosparql:gmlLiteral"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"beginknoop"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"@type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Punt"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"Geometrie.gml"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"@value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;gml:Point srsName='urn:ogc:def:crs:EPSG::31370' srsDimension='2'&gt;&lt;gml:pos&gt;184783.609986328 112696.828017466&lt;/gml:pos&gt;&lt;/gml:Point&gt;"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"@type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"geosparql:gmlLiteral"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"eindknoop"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"@type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Punt"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"Geometrie.gml"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"@value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;gml:Point srsName='urn:ogc:def:crs:EPSG::31370' srsDimension='2'&gt;&lt;gml:pos&gt;  &lt;/gml:pos&gt;&lt;/gml:Point&gt;"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"@type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"geosparql:gmlLiteral"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"wegsegmentstatus"</span><span class="p">:</span><span class="w"> </span><span class="s2">"cl-wegsegmentStatus#in_gebruik"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"morfologischeWegklasse"</span><span class="p">:</span><span class="w"> </span><span class="s2">"cl-morfologischeWegklasse#114"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"wegcategorie"</span><span class="p">:</span><span class="w"> </span><span class="s2">"cl-wegcategorie#-9"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"wegverharding"</span><span class="p">:</span><span class="w"> </span><span class="s2">"cl-wegverharding#2"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"linkerwergbeheerder"</span><span class="p">:</span><span class="s2">"cl-beheerder#44040"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"rechterwergbeheerder"</span><span class="p">:</span><span class="s2">"cl-beheerder#44040"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"methode wegsegmentgeometrie"</span><span class="p">:</span><span class="s2">"cl-geometrieMethode#2"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"toegangsbeperking"</span><span class="p">:</span><span class="w"> </span><span class="s2">"cl-toegangsbeperking#openbare_weg"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"linkerstraatnaam"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nvt"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"rechterstraatnaam"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nvt"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"linkergemeentenaam"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ng"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"rechtergemeentenaam"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ng"</span><span class="w">
+</span><span class="p">},{</span><span class="w">
+    </span><span class="nl">"behoortTot"</span><span class="p">:</span><span class="w">
+    </span><span class="p">[{</span><span class="w">
+      </span><span class="nl">"@type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"EuropeseWeg"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"europeesWegnummer"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"@type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NationaleWeg"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"nationaalWegnummer"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+    </span><span class="nl">"behoortTotSet"</span><span class="p">:</span><span class="w">
+    </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"@type"</span><span class="p">:</span><span class="s2">"GenummerdeWeg"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"genummerdeWegnummer"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+
+  
+</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span></code></pre>
+</figure>
+:ET

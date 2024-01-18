@@ -1,0 +1,261 @@
+{"0": {
+    "doc": "Test",
+    "title": "Test",
+    "content": " ",
+    "url": "/basic_setup.html",
+    
+    "relUrl": "/basic_setup.html"
+  },"1": {
+    "doc": "Home",
+    "title": "Onboarding Tech docs",
+    "content": " ",
+    "url": "/#onboarding-tech-docs",
+    
+    "relUrl": "/#onboarding-tech-docs"
+  },"2": {
+    "doc": "Home",
+    "title": "Home",
+    "content": " ",
+    "url": "/",
+    
+    "relUrl": "/"
+  },"3": {
+    "doc": "Basic Setup",
+    "title": "Publishing a Simple Data Set With a Basic Setup",
+    "content": "This quick start guide will show you how to combine a LDIO Workbench and a LDES Server to create a basic setup for publishing linked data as a Linked Data Event Stream (LDES). Please see the introduction for the example data set and pre-requisites, as well as an overview of all examples. ",
+    "url": "/basic/Basic%20Setup/index#publishing-a-simple-data-set-with-a-basic-setup",
+    
+    "relUrl": "/basic/Basic%20Setup/index#publishing-a-simple-data-set-with-a-basic-setup"
+  },"4": {
+    "doc": "Basic Setup",
+    "title": "All the Things We Need",
+    "content": "In order to publish your data set as a LDES you will need to setup and configure a few systems. To start with you need a LDES Server. It will accepts, store and serve the data set. Next you will need a workbench which at the least creates version objects from your data set which typically consists of state objects. In addition, as your data set will typically not be linked data, you will have to create a small pipeline in the workbench to transform your custom data model formatted in whatever format that you expose to a linked data model. The LDES server can ingest the resulting linked data model from several RDF serializations and serve the event stream in any of those RDF formats. Let’s start by creating a Docker Compose file containing a LDES server, its MongoDB storage container and a LDIO Workbench. First, we start by naming the file docker-compose.yml and add the file version and a private network which allows our three systems to interact: . version: '2.0' networks: basic-setup: name: basic-setup_ldes-network . We add the MongoDB system as our first service. We simply use the latest mongo image from Docker Hub and expose the default MongoDB port. This allows use to use a tool such as MongoDB Compass to examine the database if needed: . services: ldes-mongodb: container_name: basic-setup_ldes-mongodb image: mongo:latest ports: - 27017:27017 networks: - basic-setup . After that we add a LDES Server as a service, point it to its configuration file using volume mapping, expose its port so we can retrieve the event stream and set it to depend on the storage container in order to delay starting the server container until after the storage container: . ldes-server: container_name: basic-setup_ldes-server image: ldes/ldes-server:2.5.0-SNAPSHOT # you can safely change this to the latest 2.x.y version volumes: - ./server/application.yml:/application.yml:ro ports: - 9003:80 networks: - basic-setup depends_on: - ldes-mongodb . Finally, we add a LDIO Workbench as a service. It too needs to have access to its configuration file which we again provide using volume mapping. We also need to expose the workbench listener port so we can feed it with models from our custom data set. ldio-workbench: container_name: basic-setup_ldio-workbench image: ldes/ldi-orchestrator:1.11.0-SNAPSHOT # you can safely change this to the latest 1.x.y version volumes: - ./workbench/application.yml:/ldio/application.yml:ro ports: - 9004:80 networks: - basic-setup . We end up with this Docker compose file. At this point we cannot start the containers yet as we do refer to the LDES Server and the LDIO Workbench configuration files but we still need to create them. ",
+    "url": "/basic/Basic%20Setup/index#all-the-things-we-need",
+    
+    "relUrl": "/basic/Basic%20Setup/index#all-the-things-we-need"
+  },"5": {
+    "doc": "Basic Setup",
+    "title": "Create the LDES Server Configuration File",
+    "content": "Let’s continue by creating a configuration file for the LDES Server. But before we do we need to think about and decide on a few things: . | in which database do we store the LDES and related information? | on what sub-path will we serve our LDES? | on what port will we run our server? | . For this tutorial we can pick any name for the database. Let’s go for basic-setup. As within our private Docker network the containers can be reached by using their service name, the MongoDB connection string becomes mongodb://ldes-mongodb/basic-setup. We do not need to specify the default port 27017. For the port (server.port) and sub-path (server.servlet.context-path) on which the LDES Server is available we’ll go for 80 respectively /ldes. Note that we had to specify that indexes should be created automatically by the application (auto-index-creation: true). Note that we also need to specify the external base URL of the LDES so that we can follow the event stream from our local system (host-name: http://localhost:9003/ldes) because we set a sub-path (context-path: /ldes). Of course if we would change the server’s external port number in the Docker compose file, we need to change it here as well. ",
+    "url": "/basic/Basic%20Setup/index#create-the-ldes-server-configuration-file",
+    
+    "relUrl": "/basic/Basic%20Setup/index#create-the-ldes-server-configuration-file"
+  },"6": {
+    "doc": "Basic Setup",
+    "title": "Create the LDIO Workbench Configuration File",
+    "content": "For the workbench configuration file we can start from the configuration we used for the minimal workbench tutorial but serve the pipelines on a different port (80). As we are now creating an integrated setup we will not send the generated members to the container log using the LdioConsoleout component, but instead we use the LdioHttpOut component. This component allows us to send the member to the LDES server ingest endpoint over HTTP. How do we determine this HTTP ingest endpoint? Because the LDIO Workbench and the LDES Server share the same private network, the workbench can address the server using its service name ldes-server as server path http://ldes-server. As we have set the sub-path to serve all event streams from /ldes we append that to the server path. Finally, as we define our LDES in the same way as we did in the minimal server tutorial, we need to append the name of the LDES (/occupancy). Putting all of this together, in this tutorial the HTTP ingest endpoint for our LDES becomes http://ldes-server/ldes/occupancy. The configuration for our output thus becomes: . outputs: - name: be.vlaanderen.informatievlaanderen.ldes.ldio.LdioHttpOut config: endpoint: http://ldes-server/ldes/occupancy rdf-writer: content-type: application/n-quads . Note that we can use the rdf-writer.content-type setting to change the RDF format used when sending the member to the LDES Server ingest endpoint. By default it is Turtle (text/turtle) but here we choose N-quads (application/n-quads) as this is faster than any other RDF serialization both when writing and parsing. In our minimal workbench tutorial we assumed that we had linked data and we POST’ed a message formatted as JSON-LD to the workbench. Usually, you will have data in a more traditional (non-linked data) model. Typically there will be an API that you can poll or maybe the source system will notify you of changes using messages. No matter if the interface is pull-driven or push-driven, the data will be format using JSON, XML, CSV or similar. Now, let’s assume that on the input side we have a JSON message that is pushed into the workbench pipeline. We need to turn this non-linked data into linked-data. To accomplish this we can attach a JSON-LD context to the message. To do so, we need to use a JsonToLdAdapter in the LdioHttpIn component and configure to use our context. We also need to map the context in the container as follows: . volumes: - ./workbench/context.jsonld:/ldio/context.jsonld:ro . Now we can change the workbench input configuration to: . input: name: be.vlaanderen.informatievlaanderen.ldes.ldio.LdioHttpIn adapter: name: be.vlaanderen.informatievlaanderen.ldes.ldi.JsonToLdAdapter config: core-context: file:///ldio/context.jsonld . Note that we have to use the URI notation for the internal container path (/ldio/context.jsonld). Alternatively, we could use some pre-existing context somewhere online ar refer to it by URL. For the transformations steps we keep the same configuration for the version object creation and end up with the resulting configuration file . ",
+    "url": "/basic/Basic%20Setup/index#create-the-ldio-workbench-configuration-file",
+    
+    "relUrl": "/basic/Basic%20Setup/index#create-the-ldio-workbench-configuration-file"
+  },"7": {
+    "doc": "Basic Setup",
+    "title": "Bringing it All Together",
+    "content": "Now that we have everything set up, let’s test the systems. We need to bring all systems up, wait for both the LDIO Workbench and LDES Server to be available, send the LDES and view definitions to the server and finally send the JSON message to the workbench. Then we can retrieve the LDEs, the view and the page containing the actual member. To run the systems, wait, send definitions and message: . clear # bring the systems up docker compose up -d # wait for the workbench while ! docker logs $(docker ps -q -f \"name=ldio-workbench$\") 2&gt; /dev/null | grep 'Started Application in' ; do sleep 1; done # wait for the server while ! docker logs $(docker ps -q -f \"name=ldes-server$\") 2&gt; /dev/null | grep 'Started Application in' ; do sleep 1; done # define the LDES curl -X POST -H \"content-type: text/turtle\" \"http://localhost:9003/ldes/admin/api/v1/eventstreams\" -d \"@./definitions/occupancy.ttl\" # define the view curl -X POST -H \"content-type: text/turtle\" \"http://localhost:9003/ldes/admin/api/v1/eventstreams/occupancy/views\" -d \"@./definitions/occupancy.by-page.ttl\" # send the message curl -X POST -H \"Content-Type: application/json\" \"http://localhost:9004/p+r-pipeline\" -d \"@./data/message.json\" . Note that we send the definitions to http://localhost:9003/ldes because we have defined server.servlet.context-path: /ldes. Note that we send a JSON message now and therefore specify a header Content-Type: application/json. To verify the LDES, view and data: . clear # get the LDES curl http://localhost:9003/ldes/occupancy # get the view curl http://localhost:9003/ldes/occupancy/by-page # get the data curl http://localhost:9003/ldes/occupancy/by-page?pageNumber=1 . Note that we explicitly noted the three steps to get to the data. Typically a system that wants to replicate and synchronize a LDES only needs access to the LDES itself and can discover the view and subsequently the pages of that view by following the links in the LDES and view. To do so, we can use a LDES Client but that is a different tutorial. ",
+    "url": "/basic/Basic%20Setup/index#bringing-it-all-together",
+    
+    "relUrl": "/basic/Basic%20Setup/index#bringing-it-all-together"
+  },"8": {
+    "doc": "Basic Setup",
+    "title": "The Party is Over, Let’s Go Home",
+    "content": "You should now know how to publish a simple data set using a LDES Workbench and use a LDES Server to serve this data set using LDES. You learned how to setup a Docker compose file from scratch, how to configure the LDES Server on a different path and port, how to configure a LDIO Workbench to accept non-linked data and send it to the LDES Server. You can now stop all the systems. To bring the containers down and remove the private network: . docker compose down . ",
+    "url": "/basic/Basic%20Setup/index#the-party-is-over-lets-go-home",
+    
+    "relUrl": "/basic/Basic%20Setup/index#the-party-is-over-lets-go-home"
+  },"9": {
+    "doc": "Basic Setup",
+    "title": "Basic Setup",
+    "content": " ",
+    "url": "/basic/Basic%20Setup/index",
+    
+    "relUrl": "/basic/Basic%20Setup/index"
+  },"10": {
+    "doc": "Test",
+    "title": "Test",
+    "content": " ",
+    "url": "/basic/basic_setup",
+    
+    "relUrl": "/basic/basic_setup"
+  },"11": {
+    "doc": "Test",
+    "title": "Test",
+    "content": " ",
+    "url": "/basic/basic_setup/index",
+    
+    "relUrl": "/basic/basic_setup/index"
+  },"12": {
+    "doc": "Test",
+    "title": "Test",
+    "content": " ",
+    "url": "/basic/index",
+    
+    "relUrl": "/basic/index"
+  },"13": {
+    "doc": "Test",
+    "title": "Publishing a Simple Data Set With a Basic Setup",
+    "content": "This quick start guide will show you how to combine a LDIO Workbench and a LDES Server to create a basic setup for publishing linked data as a Linked Data Event Stream (LDES). Please see the introduction for the example data set and pre-requisites, as well as an overview of all examples. ",
+    "url": "/basic/index#publishing-a-simple-data-set-with-a-basic-setup",
+    
+    "relUrl": "/basic/index#publishing-a-simple-data-set-with-a-basic-setup"
+  },"14": {
+    "doc": "Test",
+    "title": "All the Things We Need",
+    "content": "In order to publish your data set as a LDES you will need to setup and configure a few systems. To start with you need a LDES Server. It will accepts, store and serve the data set. Next you will need a workbench which at the least creates version objects from your data set which typically consists of state objects. In addition, as your data set will typically not be linked data, you will have to create a small pipeline in the workbench to transform your custom data model formatted in whatever format that you expose to a linked data model. The LDES server can ingest the resulting linked data model from several RDF serializations and serve the event stream in any of those RDF formats. Let’s start by creating a Docker Compose file containing a LDES server, its MongoDB storage container and a LDIO Workbench. First, we start by naming the file docker-compose.yml and add the file version and a private network which allows our three systems to interact: . version: '2.0' networks: basic-setup: name: basic-setup_ldes-network . We add the MongoDB system as our first service. We simply use the latest mongo image from Docker Hub and expose the default MongoDB port. This allows use to use a tool such as MongoDB Compass to examine the database if needed: . services: ldes-mongodb: container_name: basic-setup_ldes-mongodb image: mongo:latest ports: - 27017:27017 networks: - basic-setup . After that we add a LDES Server as a service, point it to its configuration file using volume mapping, expose its port so we can retrieve the event stream and set it to depend on the storage container in order to delay starting the server container until after the storage container: . ldes-server: container_name: basic-setup_ldes-server image: ldes/ldes-server:2.5.0-SNAPSHOT # you can safely change this to the latest 2.x.y version volumes: - ./server/application.yml:/application.yml:ro ports: - 9003:80 networks: - basic-setup depends_on: - ldes-mongodb . Finally, we add a LDIO Workbench as a service. It too needs to have access to its configuration file which we again provide using volume mapping. We also need to expose the workbench listener port so we can feed it with models from our custom data set. ldio-workbench: container_name: basic-setup_ldio-workbench image: ldes/ldi-orchestrator:1.11.0-SNAPSHOT # you can safely change this to the latest 1.x.y version volumes: - ./workbench/application.yml:/ldio/application.yml:ro ports: - 9004:80 networks: - basic-setup . We end up with this Docker compose file. At this point we cannot start the containers yet as we do refer to the LDES Server and the LDIO Workbench configuration files but we still need to create them. ",
+    "url": "/basic/index#all-the-things-we-need",
+    
+    "relUrl": "/basic/index#all-the-things-we-need"
+  },"15": {
+    "doc": "Test",
+    "title": "Create the LDES Server Configuration File",
+    "content": "Let’s continue by creating a configuration file for the LDES Server. But before we do we need to think about and decide on a few things: . | in which database do we store the LDES and related information? | on what sub-path will we serve our LDES? | on what port will we run our server? | . For this tutorial we can pick any name for the database. Let’s go for basic-setup. As within our private Docker network the containers can be reached by using their service name, the MongoDB connection string becomes mongodb://ldes-mongodb/basic-setup. We do not need to specify the default port 27017. For the port (server.port) and sub-path (server.servlet.context-path) on which the LDES Server is available we’ll go for 80 respectively /ldes. Note that we had to specify that indexes should be created automatically by the application (auto-index-creation: true). Note that we also need to specify the external base URL of the LDES so that we can follow the event stream from our local system (host-name: http://localhost:9003/ldes) because we set a sub-path (context-path: /ldes). Of course if we would change the server’s external port number in the Docker compose file, we need to change it here as well. ",
+    "url": "/basic/index#create-the-ldes-server-configuration-file",
+    
+    "relUrl": "/basic/index#create-the-ldes-server-configuration-file"
+  },"16": {
+    "doc": "Test",
+    "title": "Create the LDIO Workbench Configuration File",
+    "content": "For the workbench configuration file we can start from the configuration we used for the minimal workbench tutorial but serve the pipelines on a different port (80). As we are now creating an integrated setup we will not send the generated members to the container log using the LdioConsoleout component, but instead we use the LdioHttpOut component. This component allows us to send the member to the LDES server ingest endpoint over HTTP. How do we determine this HTTP ingest endpoint? Because the LDIO Workbench and the LDES Server share the same private network, the workbench can address the server using its service name ldes-server as server path http://ldes-server. As we have set the sub-path to serve all event streams from /ldes we append that to the server path. Finally, as we define our LDES in the same way as we did in the minimal server tutorial, we need to append the name of the LDES (/occupancy). Putting all of this together, in this tutorial the HTTP ingest endpoint for our LDES becomes http://ldes-server/ldes/occupancy. The configuration for our output thus becomes: . outputs: - name: be.vlaanderen.informatievlaanderen.ldes.ldio.LdioHttpOut config: endpoint: http://ldes-server/ldes/occupancy rdf-writer: content-type: application/n-quads . Note that we can use the rdf-writer.content-type setting to change the RDF format used when sending the member to the LDES Server ingest endpoint. By default it is Turtle (text/turtle) but here we choose N-quads (application/n-quads) as this is faster than any other RDF serialization both when writing and parsing. In our minimal workbench tutorial we assumed that we had linked data and we POST’ed a message formatted as JSON-LD to the workbench. Usually, you will have data in a more traditional (non-linked data) model. Typically there will be an API that you can poll or maybe the source system will notify you of changes using messages. No matter if the interface is pull-driven or push-driven, the data will be format using JSON, XML, CSV or similar. Now, let’s assume that on the input side we have a JSON message that is pushed into the workbench pipeline. We need to turn this non-linked data into linked-data. To accomplish this we can attach a JSON-LD context to the message. To do so, we need to use a JsonToLdAdapter in the LdioHttpIn component and configure to use our context. We also need to map the context in the container as follows: . volumes: - ./workbench/context.jsonld:/ldio/context.jsonld:ro . Now we can change the workbench input configuration to: . input: name: be.vlaanderen.informatievlaanderen.ldes.ldio.LdioHttpIn adapter: name: be.vlaanderen.informatievlaanderen.ldes.ldi.JsonToLdAdapter config: core-context: file:///ldio/context.jsonld . Note that we have to use the URI notation for the internal container path (/ldio/context.jsonld). Alternatively, we could use some pre-existing context somewhere online ar refer to it by URL. For the transformations steps we keep the same configuration for the version object creation and end up with the resulting configuration file . ",
+    "url": "/basic/index#create-the-ldio-workbench-configuration-file",
+    
+    "relUrl": "/basic/index#create-the-ldio-workbench-configuration-file"
+  },"17": {
+    "doc": "Test",
+    "title": "Bringing it All Together",
+    "content": "Now that we have everything set up, let’s test the systems. We need to bring all systems up, wait for both the LDIO Workbench and LDES Server to be available, send the LDES and view definitions to the server and finally send the JSON message to the workbench. Then we can retrieve the LDEs, the view and the page containing the actual member. To run the systems, wait, send definitions and message: . clear # bring the systems up docker compose up -d # wait for the workbench while ! docker logs $(docker ps -q -f \"name=ldio-workbench$\") 2&gt; /dev/null | grep 'Started Application in' ; do sleep 1; done # wait for the server while ! docker logs $(docker ps -q -f \"name=ldes-server$\") 2&gt; /dev/null | grep 'Started Application in' ; do sleep 1; done # define the LDES curl -X POST -H \"content-type: text/turtle\" \"http://localhost:9003/ldes/admin/api/v1/eventstreams\" -d \"@./definitions/occupancy.ttl\" # define the view curl -X POST -H \"content-type: text/turtle\" \"http://localhost:9003/ldes/admin/api/v1/eventstreams/occupancy/views\" -d \"@./definitions/occupancy.by-page.ttl\" # send the message curl -X POST -H \"Content-Type: application/json\" \"http://localhost:9004/p+r-pipeline\" -d \"@./data/message.json\" . Note that we send the definitions to http://localhost:9003/ldes because we have defined server.servlet.context-path: /ldes. Note that we send a JSON message now and therefore specify a header Content-Type: application/json. To verify the LDES, view and data: . clear # get the LDES curl http://localhost:9003/ldes/occupancy # get the view curl http://localhost:9003/ldes/occupancy/by-page # get the data curl http://localhost:9003/ldes/occupancy/by-page?pageNumber=1 . Note that we explicitly noted the three steps to get to the data. Typically a system that wants to replicate and synchronize a LDES only needs access to the LDES itself and can discover the view and subsequently the pages of that view by following the links in the LDES and view. To do so, we can use a LDES Client but that is a different tutorial. ",
+    "url": "/basic/index#bringing-it-all-together",
+    
+    "relUrl": "/basic/index#bringing-it-all-together"
+  },"18": {
+    "doc": "Test",
+    "title": "The Party is Over, Let’s Go Home",
+    "content": "You should now know how to publish a simple data set using a LDES Workbench and use a LDES Server to serve this data set using LDES. You learned how to setup a Docker compose file from scratch, how to configure the LDES Server on a different path and port, how to configure a LDIO Workbench to accept non-linked data and send it to the LDES Server. You can now stop all the systems. To bring the containers down and remove the private network: . docker compose down . ",
+    "url": "/basic/index#the-party-is-over-lets-go-home",
+    
+    "relUrl": "/basic/index#the-party-is-over-lets-go-home"
+  },"19": {
+    "doc": "Input data",
+    "title": "Input data",
+    "content": "Onderstaande datavoorbeelden werden gedownload van GRBgis via de download toepassing: https://download.vlaanderen.be/product/1-grbgis . Downloadtoepassing voor data wegenregister geeft enkel shapefile weer: https://download.vlaanderen.be/product/10412-wegenregister-15122023 . ",
+    "url": "/basis/Wegenregister/1_input",
+    
+    "relUrl": "/basis/Wegenregister/1_input"
+  },"20": {
+    "doc": "Input data",
+    "title": "Wegsegment",
+    "content": "&lt;?xml version=\"1.0\" encoding=\"utf-8\"?&gt; &lt;agiv:FeatureCollection xmlns:gml=\"http://www.opengis.net/gml\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xsi:schemaLocation=\"http://www.agiv.be/agiv Wegsegment44040.xsd\" xmlns:agiv=\"http://www.agiv.be/agiv\"&gt; &lt;gml:boundedBy&gt; &lt;gml:Box srsName=\"EPSG:31370\"&gt; &lt;gml:coordinates&gt;107440.708013833,184783.609986328 112696.828017466,192266.132487502&lt;/gml:coordinates&gt; &lt;/gml:Box&gt; &lt;/gml:boundedBy&gt; &lt;gml:featureMember&gt; &lt;agiv:Wegsegment44040&gt; &lt;agiv:OIDN&gt;730719&lt;/agiv:OIDN&gt; &lt;agiv:UIDN&gt;1790014&lt;/agiv:UIDN&gt; &lt;agiv:VERSIE&gt;1&lt;/agiv:VERSIE&gt; &lt;agiv:BEGINDATUM&gt;2023-05-03&lt;/agiv:BEGINDATUM&gt; &lt;agiv:VERSDATUM&gt;2023-05-03&lt;/agiv:VERSDATUM&gt; &lt;agiv:WS_OIDN&gt;144503&lt;/agiv:WS_OIDN&gt; &lt;agiv:WS_UIDN&gt;144503_1&lt;/agiv:WS_UIDN&gt; &lt;agiv:STATUS&gt;4&lt;/agiv:STATUS&gt; &lt;agiv:LBLSTATUS&gt;in gebruik&lt;/agiv:LBLSTATUS&gt; &lt;agiv:LSTRNMID&gt;-9&lt;/agiv:LSTRNMID&gt; &lt;agiv:LSTRNM&gt;nvt&lt;/agiv:LSTRNM&gt; &lt;agiv:LNISCODE&gt;-8&lt;/agiv:LNISCODE&gt; &lt;agiv:LGEMEENTE&gt;ng&lt;/agiv:LGEMEENTE&gt; &lt;agiv:RSTRNMID&gt;-9&lt;/agiv:RSTRNMID&gt; &lt;agiv:RSTRNM&gt;nvt&lt;/agiv:RSTRNM&gt; &lt;agiv:RNISCODE&gt;-8&lt;/agiv:RNISCODE&gt; &lt;agiv:RGEMEENTE&gt;ng&lt;/agiv:RGEMEENTE&gt; &lt;agiv:MORF&gt;114&lt;/agiv:MORF&gt; &lt;agiv:LBLMORF&gt;wandel- of fietsweg, niet toegankelijk voor andere voertuigen&lt;/agiv:LBLMORF&gt; &lt;agiv:WEGCAT&gt;-9&lt;/agiv:WEGCAT&gt; &lt;agiv:LBLWEGCAT&gt;niet van toepassing&lt;/agiv:LBLWEGCAT&gt; &lt;agiv:VERH&gt;2&lt;/agiv:VERH&gt; &lt;agiv:LBLVERH&gt;weg met losse verharding&lt;/agiv:LBLVERH&gt; &lt;agiv:BEHEER&gt;44040&lt;/agiv:BEHEER&gt; &lt;agiv:LBLBEHEER&gt;Gemeente Melle&lt;/agiv:LBLBEHEER&gt; &lt;agiv:METHODE&gt;2&lt;/agiv:METHODE&gt; &lt;agiv:LBLMETHODE&gt;ingemeten&lt;/agiv:LBLMETHODE&gt; &lt;agiv:TGBEP&gt;1&lt;/agiv:TGBEP&gt; &lt;agiv:LBLTGBEP&gt;openbare weg&lt;/agiv:LBLTGBEP&gt; &lt;agiv:BGNINV&gt;-9&lt;/agiv:BGNINV&gt; &lt;agiv:LBLBGNINV&gt;niet van toepassing&lt;/agiv:LBLBGNINV&gt; &lt;agiv:LENGTE&gt;117.62&lt;/agiv:LENGTE&gt; &lt;gml:lineStringProperty&gt; &lt;gml:LineString srsName=\"EPSG:31370\"&gt; &lt;gml:coordinates&gt;111735.735024802,186845.156995755 111695.148976773,186801.500995725 111670.02302476,186788.219971713 111642.305008739,186777.843011707&lt;/gml:coordinates&gt; &lt;/gml:LineString&gt; &lt;/gml:lineStringProperty&gt; &lt;/agiv:Wegsegment44040&gt; &lt;/gml:featureMember&gt; &lt;/gml:featureMember&gt; &lt;/agiv:FeatureCollection&gt; . ",
+    "url": "/basis/Wegenregister/1_input#wegsegment",
+    
+    "relUrl": "/basis/Wegenregister/1_input#wegsegment"
+  },"21": {
+    "doc": "Input data",
+    "title": "Wegknoop",
+    "content": "&lt;?xml version=\"1.0\" encoding=\"utf-8\"?&gt; &lt;agiv:FeatureCollection xmlns:gml=\"http://www.opengis.net/gml\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xsi:schemaLocation=\"http://www.agiv.be/agiv Wegknoop44040.xsd\" xmlns:agiv=\"http://www.agiv.be/agiv\"&gt; &lt;gml:boundedBy&gt; &lt;gml:Box srsName=\"EPSG:31370\"&gt; &lt;gml:coordinates&gt;107537.922029905,184888.016002402 112320.775345206,191227.645446785&lt;/gml:coordinates&gt; &lt;/gml:Box&gt; &lt;/gml:boundedBy&gt; &lt;gml:featureMember&gt; &lt;agiv:Wegknoop44040&gt; &lt;agiv:OIDN&gt;1053685&lt;/agiv:OIDN&gt; &lt;agiv:UIDN&gt;1079324&lt;/agiv:UIDN&gt; &lt;agiv:VERSIE&gt;1&lt;/agiv:VERSIE&gt; &lt;agiv:BEGINDATUM&gt;2023-05-03&lt;/agiv:BEGINDATUM&gt; &lt;agiv:VERSDATUM&gt;2023-05-03&lt;/agiv:VERSDATUM&gt; &lt;agiv:WK_OIDN&gt;2010770&lt;/agiv:WK_OIDN&gt; &lt;agiv:WK_UIDN&gt;2010770_1&lt;/agiv:WK_UIDN&gt; &lt;agiv:TYPE&gt;1&lt;/agiv:TYPE&gt; &lt;agiv:LBLTYPE&gt;echte knoop&lt;/agiv:LBLTYPE&gt; &lt;agiv:BGNINV&gt;-9&lt;/agiv:BGNINV&gt; &lt;agiv:LBLBGNINV&gt;niet van toepassing&lt;/agiv:LBLBGNINV&gt; &lt;gml:pointProperty&gt; &lt;gml:Point srsName=\"EPSG:31370\"&gt; &lt;gml:coordinates&gt;111915.845104925,186717.758595664&lt;/gml:coordinates&gt; &lt;/gml:Point&gt; &lt;/gml:pointProperty&gt; &lt;/agiv:Wegknoop44040&gt; &lt;/gml:featureMember&gt; &lt;/agiv:FeatureCollection&gt; . ",
+    "url": "/basis/Wegenregister/1_input#wegknoop",
+    
+    "relUrl": "/basis/Wegenregister/1_input#wegknoop"
+  },"22": {
+    "doc": "Input data",
+    "title": "Aantal rijstroken (AttRijstroken)",
+    "content": " ",
+    "url": "/basis/Wegenregister/1_input#aantal-rijstroken-attrijstroken",
+    
+    "relUrl": "/basis/Wegenregister/1_input#aantal-rijstroken-attrijstroken"
+  },"23": {
+    "doc": "Input data",
+    "title": "Wegbreedte (AttWegbreedte)",
+    "content": " ",
+    "url": "/basis/Wegenregister/1_input#wegbreedte-attwegbreedte",
+    
+    "relUrl": "/basis/Wegenregister/1_input#wegbreedte-attwegbreedte"
+  },"24": {
+    "doc": "Input data",
+    "title": "Wegverharding (AttWegverhard)",
+    "content": " ",
+    "url": "/basis/Wegenregister/1_input#wegverharding-attwegverhard",
+    
+    "relUrl": "/basis/Wegenregister/1_input#wegverharding-attwegverhard"
+  },"25": {
+    "doc": "Input data",
+    "title": "Ongelijkgrondse kruising (RltOgkruising)",
+    "content": " ",
+    "url": "/basis/Wegenregister/1_input#ongelijkgrondse-kruising-rltogkruising",
+    
+    "relUrl": "/basis/Wegenregister/1_input#ongelijkgrondse-kruising-rltogkruising"
+  },"26": {
+    "doc": "Input data",
+    "title": "Europese weg (AttEuropweg)",
+    "content": " ",
+    "url": "/basis/Wegenregister/1_input#europese-weg-atteuropweg",
+    
+    "relUrl": "/basis/Wegenregister/1_input#europese-weg-atteuropweg"
+  },"27": {
+    "doc": "Input data",
+    "title": "Nationale weg (AttNationweg)",
+    "content": " ",
+    "url": "/basis/Wegenregister/1_input#nationale-weg-attnationweg",
+    
+    "relUrl": "/basis/Wegenregister/1_input#nationale-weg-attnationweg"
+  },"28": {
+    "doc": "Input data",
+    "title": "Genummerde weg (AttGenumweg)",
+    "content": " ",
+    "url": "/basis/Wegenregister/1_input#genummerde-weg-attgenumweg",
+    
+    "relUrl": "/basis/Wegenregister/1_input#genummerde-weg-attgenumweg"
+  },"29": {
+    "doc": "Input data",
+    "title": "Referentiepunt (Refpunt)",
+    "content": " ",
+    "url": "/basis/Wegenregister/1_input#referentiepunt-refpunt",
+    
+    "relUrl": "/basis/Wegenregister/1_input#referentiepunt-refpunt"
+  },"30": {
+    "doc": "Oslo model",
+    "title": "OSLO model",
+    "content": "Het datavoorbeeld Wegenregister werd gemapt op het OSLO model wegenregister: . ",
+    "url": "/basis/Wegenregister/3_model#oslo-model",
+    
+    "relUrl": "/basis/Wegenregister/3_model#oslo-model"
+  },"31": {
+    "doc": "Oslo model",
+    "title": "Oslo model",
+    "content": " ",
+    "url": "/basis/Wegenregister/3_model",
+    
+    "relUrl": "/basis/Wegenregister/3_model"
+  },"32": {
+    "doc": "OSLO mapping",
+    "title": "OSLO mapping",
+    "content": "{ \"@context\": [ \"https://raw.githubusercontent.com/samuvack/context/main/wegenregister.jsonld\", \"https://data.vlaanderen.be/doc/applicatieprofiel/GEODCAT-AP-VL/erkendestandaard/2022-04-21/context/geodcatap-vlaanderen.jsonld\", \"https://data.vlaanderen.be/doc/applicatieprofiel/generiek-basis/zonderstatus/2019-07-01/context/generiek-basis.jsonld\" , { \"cl-morfologieType\": \"https://data.vlaanderen.be/doc/concept/Wegenregister_morfologieType\", \"cl-wegcategorieType\": \"https://data.vlaanderen.be/doc/concept/Wegenregister_wegcategorieType\", \"cl-wegsegmentStatus\": \"https://data.vlaanderen.be/doc/concept/Wegenregister_wegcategorieType\", \"cl-geometrieMethode\": \"https://data.vlaanderen.be/doc/concept/Wegenregister_geometrieMethode\", \"cl-genummerdeWegRichting\": \"https://data.vlaanderen.be/doc/concept/Wegenregister_genummerdeWegRichting\", \"cl-toegangsbeperkingType\": \"https://data.vlaanderen.be/doc/concept/Wegenregister_toegangsbeperkingType\", \"cl-wegknoopType\": \"https://data.vlaanderen.be/doc/concept/Wegenregister_wegknoopType\", \"cl-wegcategorie\": \"https://data.vlaanderen.be/doc/concept/Wegenregister_wegcategorie\", \"cl-referentiepuntType\": \"https://data.vlaanderen.be/doc/concept/Wegenregister_referentiepuntType\", \"cl_ondergrondseKruisingType\": \"https://data.vlaanderen.be/doc/concept/Wegenregister_referentiepuntType\", \"cl-wegsegmentStatus\": \"https://data.vlaanderen.be/doc/concept/Wegenregister_wegsegmentStatus\", \"cl-wegverhardingType\": \"https://data.vlaanderen.be/doc/concept/Wegenregister_wegverhardingType\", \"cl-toegangsbeperkingType\": \"https://data.vlaanderen.be/doc/concept/Wegenregister_toegangsbeperkingType\", \"cl-beheerder\":\"https://data.vlaanderen.be/doc/concept/Wegenregister_beheerder\", \"cl-richtingWaarde\": \"https://data.vlaanderen.be/doc/concept/Wegenregister_richtingWaarde\" }], \"@graph\": [ { \"@id\": \"_:datasetweg001\", \"@type\": \"Dataset\", \"Dataset.titel\": { \"@language\": \"nl\", \"@value\": \"GRB - wegenregister\" }, \"Dataset.beschrijving\": [ { \"@language\": \"nl\", \"@value\": \"Het Wegenregister is het middenschalig referentiebestand van de wegen in Vlaanderen.\" } ], \"Dataset.toegankelijkheid\": \"cl-access:PUBLIC\", \"Dataset.trefwoord\": [ { \"@language\": \"nl\", \"@value\": \"GRB\" } ] }, { \"@id\": \"_:wegsegment001\", \"@type\": \"Wegsegment\", \"middellijnGeometrie\": { \"@type\": \"Lijnstring\", \"Geometrie.gml\": { \"@value\": \"&lt;gml:LineString srsName='urn:ogc:def:crs:EPSG::31370' srsDimension='2'&gt;&lt;gml:posList&gt; 107440.708013833,184783.609986328 112696.828017466,192266.132487502 &lt;/gml:posList&gt;&lt;/gml:LineString&gt;\", \"@type\": \"geosparql:gmlLiteral\" } }, \"beginknoop\": { \"@type\": \"Punt\", \"Geometrie.gml\": { \"@value\": \"&lt;gml:Point srsName='urn:ogc:def:crs:EPSG::31370' srsDimension='2'&gt;&lt;gml:pos&gt;184783.609986328 112696.828017466&lt;/gml:pos&gt;&lt;/gml:Point&gt;\", \"@type\": \"geosparql:gmlLiteral\" } }, \"eindknoop\": { \"@type\": \"Punt\", \"Geometrie.gml\": { \"@value\": \"&lt;gml:Point srsName='urn:ogc:def:crs:EPSG::31370' srsDimension='2'&gt;&lt;gml:pos&gt; &lt;/gml:pos&gt;&lt;/gml:Point&gt;\", \"@type\": \"geosparql:gmlLiteral\" } }, \"wegsegmentstatus\": \"cl-wegsegmentStatus#in_gebruik\", \"morfologischeWegklasse\": \"cl-morfologischeWegklasse#114\", \"wegcategorie\": \"cl-wegcategorie#-9\", \"wegverharding\": \"cl-wegverharding#2\", \"linkerwergbeheerder\":\"cl-beheerder#44040\", \"rechterwergbeheerder\":\"cl-beheerder#44040\", \"methode wegsegmentgeometrie\":\"cl-geometrieMethode#2\", \"toegangsbeperking\": \"cl-toegangsbeperking#openbare_weg\", \"linkerstraatnaam\": \"nvt\", \"rechterstraatnaam\": \"nvt\", \"linkergemeentenaam\": \"ng\", \"rechtergemeentenaam\": \"ng\" },{ \"behoortTot\": [{ \"@type\": \"EuropeseWeg\", \"europeesWegnummer\": \"\" }, { \"@type\": \"NationaleWeg\", \"nationaalWegnummer\": \"\" } ], \"behoortTotSet\": [ { \"@type\":\"GenummerdeWeg\", \"genummerdeWegnummer\": \"\" } ] } ] } . ",
+    "url": "/basis/Wegenregister/4_oslo_mapping",
+    
+    "relUrl": "/basis/Wegenregister/4_oslo_mapping"
+  },"33": {
+    "doc": "Expanded OSLO mapping",
+    "title": "expanded OSLO mapping",
+    "content": "[ { \"@id\": \"_:datasetweg001\", \"@type\": \"http://www.w3.org/ns/dcat#Dataset\", \"http://purl.org/dc/terms/description\": { \"@language\": \"nl\", \"@value\": \"Het Wegenregister is het middenschalig referentiebestand van de wegen in Vlaanderen.\" }, \"http://purl.org/dc/terms/title\": { \"@language\": \"nl\", \"@value\": \"GRB - wegenregister\" }, \"http://purl.org/dc/terms/accessRights\": \"cl-access:PUBLIC\", \"http://www.w3.org/ns/dcat#keyword\": { \"@language\": \"nl\", \"@value\": \"GRB\" } }, { \"@id\": \"_:wegsegment001\", \"@type\": \"https://data.vlaanderen.be/ns/weg#Wegsegment\", \"https://data.vlaanderen.be/ns/weg#beginknoop\": { \"@type\": \"http://www.opengis.net/ont/sf#Point\", \"http://www.opengis.net/ont/geosparql#asGML\": { \"@type\": \"geosparql:gmlLiteral\", \"@value\": \"&lt;gml:Point srsName='urn:ogc:def:crs:EPSG::31370' srsDimension='2'&gt;&lt;gml:pos&gt;184783.609986328 112696.828017466&lt;/gml:pos&gt;&lt;/gml:Point&gt;\" } }, \"https://data.vlaanderen.be/ns/weg#eindknoop\": { \"@type\": \"http://www.opengis.net/ont/sf#Point\", \"http://www.opengis.net/ont/geosparql#asGML\": { \"@type\": \"geosparql:gmlLiteral\", \"@value\": \"&lt;gml:Point srsName='urn:ogc:def:crs:EPSG::31370' srsDimension='2'&gt;&lt;gml:pos&gt; &lt;/gml:pos&gt;&lt;/gml:Point&gt;\" } }, \"https://data.vlaanderen.be/ns/weg#linkergemeentenaam\": { \"@type\": \"https://data.vlaanderen.be/ns/adres#Gemeentenaam\", \"@value\": \"ng\" }, \"https://data.vlaanderen.be/ns/weg#linkerstraatnaam\": { \"@type\": \"https://data.vlaanderen.be/ns/adres#Straatnaam\", \"@value\": \"nvt\" }, \"https://data.vlaanderen.be/ns/weg#middellijnGeometrie\": { \"@type\": \"http://www.opengis.net/ont/sf#LineString\", \"http://www.opengis.net/ont/geosparql#asGML\": { \"@type\": \"geosparql:gmlLiteral\", \"@value\": \"&lt;gml:LineString srsName='urn:ogc:def:crs:EPSG::31370' srsDimension='2'&gt;&lt;gml:posList&gt; 107440.708013833,184783.609986328 112696.828017466,192266.132487502 &lt;/gml:posList&gt;&lt;/gml:LineString&gt;\" } }, \"https://data.vlaanderen.be/ns/weg#morfologischeWegklasse\": { \"@type\": \"http://www.w3.org/2004/02/skos/core#Concept\", \"@value\": \"cl-morfologischeWegklasse#114\" }, \"https://data.vlaanderen.be/ns/weg#rechtergemeentenaam\": { \"@type\": \"https://data.vlaanderen.be/ns/adres#Gemeentenaam\", \"@value\": \"ng\" }, \"https://data.vlaanderen.be/ns/weg#rechterstraatnaam\": { \"@type\": \"https://data.vlaanderen.be/ns/adres#Straatnaam\", \"@value\": \"nvt\" }, \"https://data.vlaanderen.be/ns/weg#toegangsbeperking\": { \"@type\": \"http://www.w3.org/2004/02/skos/core#Concept\", \"@value\": \"cl-toegangsbeperking#openbare_weg\" }, \"https://data.vlaanderen.be/ns/weg#wegcategorie\": { \"@type\": \"http://www.w3.org/2004/02/skos/core#Concept\", \"@value\": \"cl-wegcategorie#-9\" }, \"https://data.vlaanderen.be/ns/weg#wegsegmentstatus\": { \"@type\": \"http://www.w3.org/2004/02/skos/core#Concept\", \"@value\": \"cl-wegsegmentStatus#in_gebruik\" }, \"https://data.vlaanderen.be/ns/weg#wegverharding\": { \"@type\": \"https://data.vlaanderen.be/ns/weg#Wegverharding\", \"@value\": \"cl-wegverharding#2\" } }, { \"https://data.vlaanderen.be/ns/weg#behoortTot\": [ { \"@type\": \"https://data.vlaanderen.be/ns/weg#EuropeseWeg\", \"https://data.vlaanderen.be/ns/weg#europeesWegnummer\": { \"@type\": \"http://www.w3.org/2001/XMLSchema#string\", \"@value\": \"\" } }, { \"@type\": \"https://data.vlaanderen.be/ns/weg#NationaleWeg\" } ], \"https://data.vlaanderen.be/ns/weg#behoortTotSetOpPositie\": { \"@type\": \"https://data.vlaanderen.be/ns/weg#GenummerdeWeg\", \"https://data.vlaanderen.be/ns/weg#genummerdeWegnummer\": { \"@type\": \"http://www.w3.org/2001/XMLSchema#string\", \"@value\": \"\" } } } ] . ",
+    "url": "/basis/Wegenregister/5_expanded_oslo_mapping#expanded-oslo-mapping",
+    
+    "relUrl": "/basis/Wegenregister/5_expanded_oslo_mapping#expanded-oslo-mapping"
+  },"34": {
+    "doc": "Expanded OSLO mapping",
+    "title": "Expanded OSLO mapping",
+    "content": " ",
+    "url": "/basis/Wegenregister/5_expanded_oslo_mapping",
+    
+    "relUrl": "/basis/Wegenregister/5_expanded_oslo_mapping"
+  },"35": {
+    "doc": "Wegenregister",
+    "title": "Wegenregister",
+    "content": "Het wegenregister is een middenschalig referentiebestand van de wegen in Vlaanderen. Het bevat alle wegen van Vlaanderen, met bijbehorende attribuutgegevens. Het bestand heeft een middenschalige precisie. Het zal uitgroeien tot een nieuwe authentieke geografische gegevensbron. ",
+    "url": "/basis/Wegenregister/index",
+    
+    "relUrl": "/basis/Wegenregister/index"
+  },"36": {
+    "doc": "Introductie basis registers",
+    "title": "Introductie basis registers",
+    "content": " ",
+    "url": "/basis/index",
+    
+    "relUrl": "/basis/index"
+  }
+}
