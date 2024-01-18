@@ -1,11 +1,11 @@
 ---
 layout: default
 parent: Wegenregister
-title: OSLO mapping
+title: Onboarding
 nav_order: 4
 ---
 
-# OSLO mapping
+# Onboarding
 
 {% highlight json %}
 {% include_relative  compact.jsonld %}
