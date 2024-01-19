@@ -1,12 +1,12 @@
 # This is a basic workflow to help you get started with Actions
-name: Copy Files to /doc
+name: Copy Files to /docs
 
 on:
   push:
     branches:
       - master
     paths-ignore:
-      - 'doc/**'
+      - 'docs/**'
 
 jobs:
   copy-files:
@@ -16,15 +16,15 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - name: Copy files excluding /doc to /doc
+    - name: Copy files excluding /docs to /docs
       run: |
-        mkdir -p doc
-        rsync -av --exclude='doc/' --exclude='.github/' ./ doc/
+        mkdir -p docs
+        rsync -av --exclude='docs/' --exclude='.github/' ./ docs/
 
     - name: Commit and Push Changes
       run: |
         git config --global user.name 'Your Name'
         git config --global user.email 'your-email@example.com'
-        git add doc/
-        git commit -m "Update documents in /doc" || echo "No changes to commit"
+        git add docs/
+        git commit -m "Update documents in /docs" || echo "No changes to commit"
         git push
