@@ -12,13 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
-      # If Token_Alles is the correct name, no changes needed. 
-      # Otherwise, remove this section if your repository is public.
-      with:
-        token: ${{ secrets.Token_Alles }} 
-
+    
     - name: Copy files excluding /docs to /docs
       run: |
         mkdir -p docs
