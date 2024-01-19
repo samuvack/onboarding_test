@@ -15,7 +15,7 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
       with:
-        token: ${{ secrets.token_test }} # Use PAT for checkout
+        token: ${{ secrets.Token_Alles }} # Use PAT for checkout
 
     - name: Copy files excluding /docs to /docs
       run: |
@@ -34,4 +34,4 @@ jobs:
         git commit -m "Update documents in /docs" || echo "No changes to commit"
         git push origin HEAD:master
       env:
-        GITHUB_TOKEN: ${{ secrets.token_test }} # Use PAT for push
+        GITHUB_TOKEN: ${{ secrets.Token_Alles }} # Use PAT for push
