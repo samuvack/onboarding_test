@@ -12,7 +12,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.token_test }} 
+
     - name: Copy files excluding /docs to /docs
       run: |
         mkdir -p docs
