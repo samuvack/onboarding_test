@@ -32,5 +32,4 @@ jobs:
         git add docs/
         git commit -m "Update documents in /docs" || echo "No changes to commit"
         git push origin HEAD:master
-      env:
-        MY_PAT: ${{ secrets.Token_Alles }} # Changed to MY_PAT to avoid confusion with GITHUB_TOKEN
+
