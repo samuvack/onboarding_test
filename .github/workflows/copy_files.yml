@@ -15,7 +15,7 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
       with:
-        token: ${{ secrets.Token_Alles }} # Use PAT for checkout
+        token: ${{ secrets.token_test }} # Use PAT for checkout
 
     - name: Copy files excluding /docs to /docs
       run: |
